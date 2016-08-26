@@ -254,7 +254,7 @@
 
     "acmeServer": {
       "type": "string",
-      "defaultValue": "https://acme-staging.api.letsencrypt.org/",
+      "defaultValue": "https://acme-v01.api.letsencrypt.org/",
       "allowedValues": [
         "https://acme-staging.api.letsencrypt.org/",
         "https://acme-v01.api.letsencrypt.org/"
@@ -299,7 +299,7 @@
         "artifactsBaseUrl": "",
         "description": "Specifies the base location of the child templates and desired state configuration scripts."
       },
-      "defaultValue": "http://ctxzachtesting.blob.core.windows.net/testing"
+      "defaultValue": "https://github.com/CitrixZacharydi/DevEnvironmentTemplate/raw/master/"
     },
 
     "artifactsBaseUrlSasToken": {
