@@ -1,0 +1,88 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>6CAFC0C6-A428-4d30-A9F9-700E829FEA51</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MyApplication</RootNamespace>
+    <AssemblyName>MyApplication</AssemblyName>
+    <Name>Create-New</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="DSC\" />
+    <Folder Include="Main Scripts\" />
+    <Folder Include="Support\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="createUiDefinition.json" />
+    <Content Include="creatingDeliveryControllerUser.json" />
+    <Content Include="creatingDomainController.json" />
+    <Content Include="creatingLoadBalancer.json" />
+    <Content Include="creatingNetscalerDisabled.json" />
+    <Content Include="creatingNetscalerEnabled.json" />
+    <Content Include="creatingVDADisabled.json" />
+    <Content Include="creatingVDAEnabled.json" />
+    <Content Include="dscmetadata.json" />
+    <Content Include="DSC\DeliveryController.ps1.zip" />
+    <Content Include="DSC\DomainController.ps1.zip" />
+    <Content Include="DSC\JumpBox.ps1.zip" />
+    <Content Include="DSC\VDA.ps1.zip" />
+    <Content Include="DSC\VDI.ps1.zip" />
+    <Content Include="Main Scripts\rdpsign.py" />
+    <Content Include="mainTemplate.json" />
+    <Content Include="mainTemplate.parameters.json" />
+    <Content Include="publicIp-existing.json" />
+    <Content Include="publicIp-new.json" />
+    <Content Include="Resources\receivertheme.tar.gz" />
+    <Content Include="storageAccount-existing.json" />
+    <Content Include="storageAccount-new.json" />
+    <Content Include="Support\createUiDefinition.json" />
+    <Content Include="Support\creatingDeliveryControllerUser.json" />
+    <Content Include="Support\creatingDomainController.json" />
+    <Content Include="Support\creatingLoadBalancer.json" />
+    <Content Include="Support\creatingNetscalerDisabled.json" />
+    <Content Include="Support\creatingNetscalerEnabled.json" />
+    <Content Include="Support\creatingVDADisabled.json" />
+    <Content Include="Support\creatingVDAEnabled.json" />
+    <Content Include="Support\dscmetadata.json" />
+    <Content Include="Support\mainTemplate.parameters.json" />
+    <Content Include="Support\publicIp-existing.json" />
+    <Content Include="Support\publicIp-new.json" />
+    <Content Include="Support\storageAccount-existing.json" />
+    <Content Include="Support\storageAccount-new.json" />
+    <Content Include="Support\updatingInboundRule.json" />
+    <Content Include="Support\updatingNicRules.json" />
+    <Content Include="Support\updatingVnetDns.json" />
+    <Content Include="updatingInboundRule.json" />
+    <Content Include="updatingNicRules.json" />
+    <Content Include="updatingVnetDns.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main Scripts\AzureManagement.ps1" />
+    <Compile Include="Main Scripts\Config.ps1" />
+    <Compile Include="Main Scripts\Create-AzureGermany.ps1" />
+    <Compile Include="Main Scripts\New-XDAzureDevEnv.ps1" />
+    <Compile Include="Support\Get-PendingReboot.ps1" />
+    <Compile Include="Support\ReplayDeliveryController.ps1" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="Build" />
+</Project>

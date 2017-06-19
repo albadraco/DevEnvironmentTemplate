@@ -3,15 +3,13 @@
   "contentVersion": "1.0.0.0",
 
   "parameters": {
-
     "namePrefix": {
       "type": "string",
       //"defaultValue": "xenapp",
       "metadata": {
-        "description":  "Specifies a prefix for all components created in deployment. This allows for several deployments to coexist. Up to 11 characters. The storage account will generate any additional characters needed to reach 24 to make uniqueness easier."
+        "description": "Specifies a prefix for all components created in deployment. This allows for several deployments to coexist. Up to 11 characters. The storage account will generate any additional characters needed to reach 24 to make uniqueness easier."
       }
     },
-
     "certificateBase64": {
       "type": "string",
       "defaultValue": "",
@@ -19,7 +17,27 @@
         "description": "Base64 encoded pfx certificate to be installed on the VMs. Password should be the same as the admin credentials."
       }
     },
-
+    "deploymentFQDNSuffix": {
+      "type": "string",
+      "defaultValue": "cloudapp.azure.com",
+      "metadata": {
+        "description": "Specifies the FQDN for storage deployment."
+      }
+    },
+    "blobStorageSuffix": {
+      "type": "string",
+      "defaultValue": "blob.core.windows.net",
+      "metadata": {
+        "description": "Specifies the blob storage deployment."
+      }
+    },
+    "gatewayFQDNSuffix": {
+      "type": "string",
+      "defaultValue": "xenapponazure.com",
+      "metadata": {
+        "description": "Specifies the gateway FQDN Suffix deployment."
+      }
+    },
     // Storage
     "vhdStorageAccount": {
       "type": "string",
@@ -121,7 +139,6 @@
         "description": "Specifies whether the public IP should be created or already exists."
       }
     },
-
     // Infrastructure
     "dcSize": {
       "type": "string",
@@ -130,7 +147,6 @@
         "description": "Specifies the size of the DC."
       }
     },
-
     "ddcSize": {
       "type": "string",
       "defaultValue": "Standard_A2",
@@ -138,7 +154,6 @@
         "description": "Specifies the size of the DDC."
       }
     },
-
     "vdaSize": {
       "type": "string",
       "defaultValue": "Standard_A2",
@@ -146,7 +161,6 @@
         "description": "Specifies the size of the VDA."
       }
     },
-
     "nsSize": {
       "type": "string",
       "defaultValue": "Standard_A2",
@@ -154,7 +168,6 @@
         "description": "Specifies the size of the NetScaler."
       }
     },
-
     "location": {
       "type": "string",
       "defaultValue": "westus",
@@ -162,7 +175,6 @@
         "description": "Specifies the Location for the deployment."
       }
     },
-
     "createVDA": {
       "type": "string",
       "defaultValue": "Disabled",
@@ -174,7 +186,6 @@
         "description": "Specifies whether to create a VDA along with the deployment."
       }
     },
-
     "createNetScaler": {
       "type": "string",
       "defaultValue": "Disabled",
@@ -186,7 +197,6 @@
         "description": "Specifies whether to create a VDA along with the deployment."
       }
     },
-
     // Credentials and domain
     "adminUsername": {
       "type": "string",
@@ -194,14 +204,12 @@
         "description": "Specifies the name of the administrator for machines, Active Directory domain, NetScaler and XenApp. Exclusion list: 'admin','administrator'. Must be no more than 9 alphanumeric characters."
       }
     },
-
     "adminPassword": {
       "type": "securestring",
       "metadata": {
         "description": "Specifies the password of the administrator for machines, Active Directory domain, NetScaler and XenApp."
       }
     },
-
     "domainName": {
       "type": "string",
       "defaultValue": "xenapp.local",
@@ -209,7 +217,6 @@
         "description": "Specifies the name of the newly created Active Directory domain."
       }
     },
-
     // XenApp settings
     "siteName": {
       "type": "string",
@@ -218,7 +225,6 @@
         "description": "Specifies the name of the XenApp site."
       }
     },
-
     "html5Mode": {
       "type": "string",
       "defaultValue": "Fallback",
@@ -231,7 +237,6 @@
         "description": "Specifies whether HTML5 Reciever is to be used."
       }
     },
-
     "emailAddress": {
       "type": "string",
       "defaultValue": "zachary.dixon@citrix.com", //TODO: remove
@@ -239,7 +244,6 @@
         "description": "Specifies the email address that that will be used to request a public SSL certificate for NetScaler gateway from letsencrypt.org on your behalf. This will also be used to notify you when the template has deployed successfully."
       }
     },
-
     "certificateAuthority": {
       "type": "string",
       "defaultValue": "Enterprise",
@@ -251,7 +255,6 @@
         "description": "Specifies whether an ACME CA or the internal Enterprise CA should be used for obtaining certificates."
       }
     },
-
     "acmeServer": {
       "type": "string",
       "defaultValue": "https://acme-v01.api.letsencrypt.org/",
@@ -263,35 +266,32 @@
         "description": "Specifies the ACME protocol server used for public TLS certificate requests. Allowed values correspond to letsencrypt.org staging or production."
       }
     },
-
     "customInboundRules": {
       "type": "object",
       "defaultValue": {
         "rules": [
         ],
         "assignments": {
-          "deliveryController": [ ],
-          "domainController": [ ],
-          "netScaler": [ ]
+          "deliveryController": [],
+          "domainController": [],
+          "netScaler": []
         }
       },
       "metadata": {
         "description": "Specifies additional inbound NAT rules to apply in this deployment. Useful for exposing individual machines more directly. The parameter is specified as an object, as in the default. See variable 'loadBalancerSettings' for an example format."
       }
     },
-
     "customApplications": {
       "type": "object",
       "defaultValue": {
-        "chocolateyPackages": [ ],
-        "publishedApplications": [ ],
-        "appGroups": [ ]
+        "chocolateyPackages": [],
+        "publishedApplications": [],
+        "appGroups": []
       },
       "metadata": {
         "description": "Specifies additional applications to be installed on the VDA and published through XenApp. The parameter is specified as an array of objects, as in the default. See variables 'applications', 'vdaSettings', and 'storeFrontSettings' for an example format. "
       }
     },
-
     // Configuration
     "artifactsBaseUrl": {
       "type": "string",
@@ -301,7 +301,6 @@
       },
       "defaultValue": "https://github.com/CitrixZacharydi/DevEnvironmentTemplate/raw/master/"
     },
-
     "artifactsBaseUrlSasToken": {
       "type": "securestring",
       "metadata": {
@@ -314,11 +313,11 @@
   "variables": {
     "artifactsLocation": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "artifactsLocationSasToken": "[parameters('artifactsBaseUrlSasToken')]",
-    "deploymentFQDN": "[concat(parameters('publicDnsName'), '.', parameters('location'), '.cloudapp.azure.com')]",
-    "gatewayFQDN": "[concat(parameters('publicDnsName'), '-', parameters('location'), '.xenapponazure.com')]",
+    "deploymentFQDN": "[concat(parameters('publicDnsName'), '.', parameters('location'), '.', parameters('deploymentFQDNSuffix'))]",
+    "gatewayFQDN": "[concat(parameters('publicDnsName'), '-', parameters('location'), '.', parameters('gatewayFQDNSuffix'))]",
 
     "userImageContainerName": "[parameters('userImageContainerName')]",
-    "userImageLocation": "[concat('http://', parameters('vhdStorageAccount'), '.blob.core.windows.net/', variables('userImageContainerName'), '/')]",
+    "userImageLocation": "[concat('http://', parameters('vhdStorageAccount'), '.', parameters('blobStorageSuffix'), '/', variables('userImageContainerName'), '/')]",
 
     "dscVersion": "2.18",
 
@@ -386,7 +385,7 @@
       "privateIp": "10.0.0.8",
       "configurationFileUrl": "[concat(variables('artifactsLocation'), 'DSC/DomainController.ps1.zip')]",
       "configurationFunction": "DomainController.ps1\\DomainController",
-      "inboundRules": [ ]
+      "inboundRules": []
     },
 
     "sqlServerSettings": {
@@ -404,7 +403,7 @@
       "fqdn": "[concat(parameters('namePrefix'), '-VDA', '.', parameters('domainName'))]",
       "machineSize": "[parameters('vdaSize')]",
       "location": "[parameters('location')]",
-      "inboundRules": [ ],
+      "inboundRules": [],
       "privateIp": "10.0.0.10",
       "configurationFileUrl": "[concat(variables('artifactsLocation'), 'DSC/VDA.ps1.zip')]",
       "configurationFunction": "VDA.ps1\\VDA"

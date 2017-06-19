@@ -1,0 +1,373 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+    // Infrastructure
+    "vhdStorageAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the storage account used for virtual machine disks. This has to be a unique name, up to 24 chars, all lowercase."
+      }
+    },
+    "publisher": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the marketplace publisher of the image to provision this machine on."
+      }
+    },
+    "offer": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the marketplace offer of the image to provision this machine on."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the marketplace sku of the image to provision this machine on."
+      }
+    },
+    "machineSize": {
+      "type": "string",
+      "defaultValue": "Standard_A2",
+      "metadata": {
+        "description": "Specifies the size of the virtual machine."
+      }
+    },
+    "machineName": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of this machine in Azure and on the network."
+      }
+    },
+    "privateIp": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the static IP to assign to this machine."
+      }
+    },
+    "availabilitySetId": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the availability set this machine should belong to."
+      }
+    },
+    "subnetId": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the id of the subnet the machine should connect to."
+      }
+    },
+    "dnsServers": {
+      "type": "array",
+      "metadata": {
+        "description": "Specifies a list of DNS servers the machine should use."
+      }
+    },
+    "lbBapId": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the id of the load balancer's back end address pool."
+      }
+    },
+    "lbInboundRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Specifies a list of inbound NAT rules to apply to this VM."
+      }
+    },
+
+    // Credentials and domain
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the administrator for machines, Active Directory domain, NetScaler and XenApp. Exclusion list: 'admin','administrator'. Must be no more than 9 alphanumeric characters."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the password of the administrator for machines, Active Directory domain, NetScaler and XenApp."
+      }
+    },
+    "domainName": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the Active Directory domain."
+      }
+    },
+    "domainControllerFQDN": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the Active Directory domain controller on the virtual network."
+      }
+    },
+    "domainControllerPrivateIp": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the private IP of a domain controller on the virtual network."
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the resource group location."
+      }
+    },
+    "artifactsLocationUri": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the base location of the child templates and desired state configuration scripts."
+      }
+    },
+    "artifactsLocationSasToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the shared access signature token which provides access to the base artifacts location."
+      }
+    },
+    "dscVersion": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the version of the DSC extension to use."
+      }
+    },
+    "configurationFileUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the URI of the DSC configuration script."
+      }
+    },
+    "configurationFunction": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the function to be executed in the DSC configuration script."
+      }
+    }
+  },
+
+  "variables": {
+    "imageOffer": "[parameters('offer')]",
+    "imageSKU": "[parameters('sku')]",
+    "planPublisher": "[parameters('publisher')]",
+    "planProduct": "[parameters('offer')]",
+    "planName": "[parameters('sku')]",
+    "nicName": "[concat(parameters('machineName'),'-nic')]",
+    "nicId": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+    "machineId": "[resourceId('Microsoft.Compute/virtualMachines',parameters('machineName'))]",
+    "configurationId": "[concat(resourceId('Microsoft.Compute/virtualMachines',parameters('machineName')),'/extensions/configure')]",
+    "osDiskName": "[concat(resourceGroup().name,'-',parameters('machineName'),'-osdisk')]",
+    "osDiskUri": "[concat('http://',parameters('vhdStorageAccount'),'.blob.core.windows.net/vhds/',variables('osDiskName'),'.vhd')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName')]",
+      "tags": {
+        "displayName": "ControllerNic"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('privateIp')]",
+              "subnet": {
+                "id": "[parameters('subnetId')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[parameters('lbBapId')]"
+                }
+              ],
+              "loadBalancerInboundNatRules": "[parameters('lbInboundRules')]"
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('machineName')]",
+      "tags": {
+        "displayName": "ControllerVM"
+      },
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('nicId')]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[parameters('availabilitySetId')]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('machineSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('machineName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('publisher')]",
+            "offer": "[parameters('offer')]",
+            "sku": "[parameters('sku')]",
+            "version": "latest"
+          }, //TODO: maybe remove this, just copied from jumpbox
+          "osDisk": {
+            "name": "[variables('osDiskName')]",
+            "vhd": {
+              "uri": "[variables('osDiskUri')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('nicId')]"
+            }
+          ]
+        }
+      },
+
+      "resources": [
+        {
+          "type": "extensions",
+          "name": "configure",
+          "apiVersion": "2015-06-15",
+          "tags": {
+            "displayName": "VdaConfiguration"
+          },
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[variables('machineId')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "[parameters('dscVersion')]",
+            "settings": {
+              "modulesUrl": "[parameters('configurationFileUrl')]",
+              "sasToken": "[parameters('artifactsLocationSasToken')]",
+              "configurationFunction": "[parameters('configurationFunction')]",
+              "Properties": {
+                "DomainName": "[parameters('domainName')]",
+                "AdminCreds": {
+                  "UserName": "[parameters('adminUsername')]",
+                  "Password": "PrivateSettingsRef:adminPassword"
+                },
+                "DomainController": "[parameters('domainControllerFQDN')]",
+                "DomainControllerIp": "[parameters('domainControllerPrivateIp')]"
+                //"DeliveryController": "[parameters('deliveryControllerFQDN')]",
+                //"DeploymentFQDN": "[parameters('deploymentFQDN')]",
+                //"GatewayFQDN": "[parameters('gatewayFQDN')]",
+                //"Packages": "[parameters('packages')]",
+                //"PublishedApplications": "[parameters('publishedApplications')]",
+                //"StoreFrontUrl": "[parameters('storeFrontUrl')]"
+              }
+            },
+            "protectedSettings": {
+              "Items": {
+                "adminPassword": "[parameters('adminPassword')]"
+              }
+            }
+          }
+        }
+      ]
+      //"resources": [
+      //  {
+      //    "type": "extensions",
+      //    "name": "configure",
+      //    "tags": {
+      //      "displayName": "ControllerConfiguration"
+      //    },
+      //    "apiVersion": "2015-06-15",
+      //    "location": "[resourceGroup().location]",
+      //    "dependsOn": [
+      //      "[variables('machineId')]"
+      //    ],
+      //    "properties": {
+      //      "publisher": "Microsoft.Powershell",
+      //      "type": "DSC",
+      //      "typeHandlerVersion": "[parameters('dscVersion')]",
+      //      "settings": {
+      //        "modulesUrl": "[parameters('configurationFileUrl')]",
+      //        "sasToken": "[parameters('artifactsLocationSasToken')]",
+      //        "configurationFunction": "[parameters('configurationFunction')]",
+      //        "wmfVersion":  "5.0",
+      //        "Properties": {
+      //          "AdminCreds": {
+      //            "UserName": "[parameters('adminUsername')]",
+      //            "Password": "PrivateSettingsRef:adminPassword"
+      //          },
+      //          "DomainName": "[parameters('domainName')]",
+      //          "DomainController": "[parameters('domainControllerFQDN')]",
+      //          "DomainControllerIp": "[parameters('domainControllerPrivateIp')]",
+      //          "SQLServer": "[parameters('sqlServerFQDN')]",
+      //          "SQLServerInstance": "[parameters('sqlServerInstance')]",
+      //          "LicenseServer": "[parameters('licenseServerFQDN')]",
+      //          //"NetScalerIP": "[parameters('netScalerPrivateIp')]",
+      //          "StoreFront": "[parameters('storeFrontFQDN')]",
+      //          //"VirtualServerName": "[parameters('virtualServerName')]",
+      //          //"VirtualServerPort": "[parameters('virtualServerPort')]",
+      //          //"ForwardServerPort": "[parameters('forwardServerPort')]",
+      //          "StoreFrontGatewayName": "[parameters('storeFrontGatewayName')]",
+      //          "EmailAddress": "[parameters('emailAddress')]",
+      //          "Authority": "[parameters('certificateAuthority')]",
+      //          "ACMEServer": "[parameters('acmeServer')]",
+      //          "GatewayFQDN": "[parameters('gatewayFQDN')]",
+      //          "DeploymentFQDN": "[parameters('deploymentFQDN')]",
+      //          "ThemeUri": "[parameters('themeUri')]",
+      //          "HTML5Mode": "[parameters('html5Mode')]",
+      //          "AppGroups": "[parameters('appGroups')]",
+      //          "CertificatePassword": {
+      //            "UserName": "CertificatePassword",
+      //            "Password": "PrivateSettingsRef:adminPassword"
+      //          },
+      //          "CertificateBase64": "[parameters('certificateBase64')]",
+      //          "DeliveryController": "[parameters('deliveryControllerFQDN')]",
+      //          "SiteName": "[parameters('siteName')]"
+      //        }
+      //      },
+      //      "protectedSettings": {
+      //        "Items": {
+      //          "AdminPassword": "[parameters('adminPassword')]"
+      //        }
+      //      }
+      //    }
+      //  }
+      //]
+    }
+  ],
+  "outputs": {
+    "machineId": {
+      "type": "string",
+      "value": "[variables('machineId')]"
+    },
+    "nicName": {
+      "type": "string",
+      "value": "[variables('nicName')]"
+    },
+    "nicId": {
+      "type": "string",
+      "value": "[variables('nicId')]"
+    },
+    "configurationId": {
+      "type": "string",
+      "value": "[variables('configurationId')]"
+    }
+  }
+}
